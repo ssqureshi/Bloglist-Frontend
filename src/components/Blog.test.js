@@ -23,8 +23,6 @@ describe('Blog tests', () => {
     likes: 7,
     __v: 0
   }
-
-  const mockHandler = jest.fn()
   test('renders content', () => {
     const view = render(<Blog blog={blog} />)
     expect(view.container).toHaveTextContent('React patterns Michael Chan')
@@ -40,15 +38,15 @@ describe('Blog tests', () => {
 
   test('clicking likes twice works', async () => {
     const mockHandler = jest.fn()
-    render(<Blog blog={blog} handleLike={mockHandler} user={loggedUser} />)
+    render(<Blog blog={blog} handleLikeChange={mockHandler} user={loggedUser} />)
 
     const user = userEvent.setup()
     const viewButton = screen.getByText('view')
     await user.click(viewButton)
 
     const likeButton = screen.getByText('like')
-    await user.click(likeButton)
-    expect(mockHandler.mock.calls).toHaveLength(1)
+    await user.dblClick(likeButton)
+    expect(mockHandler.mock.calls).toHaveLength(2)
 
 
   })

@@ -1,27 +1,21 @@
 import { useState } from 'react'
 import blogService from '../services/blogs'
 
-const Blog = ({ blog, setBlogs, blogs, user }) => {
+const Blog = ({ blog, setBlogs, blogs, user, handleLikeChange }) => {
   const [visible, setVisible] = useState(false)
 
-  const handleVisibility = async () => {
+  const handleVisibility = () => {
     setVisible(!visible)
   }
-  const handleLike = async () => {
-    try {
-      const id = blog.id
-      await blogService.update(id, {
-        'title': blog.title,
-        'author': blog.author,
-        'url': blog.url,
-        'likes': blog.likes + 1
-      })
-      const newBlogs = await blogService.getAll()
-      setBlogs(newBlogs.sort((a, b) => b.likes - a.likes))
-    }
-    catch (err) {
-      console.log(err)
-    }
+  const handleLike = () => {
+    const id = blog.id
+    handleLikeChange(id, {
+      'title': blog.title,
+      'author': blog.author,
+      'url': blog.url,
+      'likes': blog.likes
+    })
+
   }
 
   const handleRemove = async () => {
@@ -46,30 +40,30 @@ const Blog = ({ blog, setBlogs, blogs, user }) => {
   }
   const Details = () => {
     return (
-      <div style={blogStyle} >
+      <div style={blogStyle} id="details" >
         {blog.title} <button onClick={handleVisibility}>hide</button>
         <br />
         {blog.url}
         <br />
-        {blog.likes} <button onClick={handleLike}>like</button>
+        {blog.likes} <button onClick={handleLike} id="like">like</button>
         <br />
         {blog.author}
         <br />
-        {blog.user.id === user.id && <button onClick={handleRemove}>remove</button>}
+        {blog.user.id === user.id && <button onClick={handleRemove} id="remove">remove</button>}
       </div>
     )
   }
 
   return (
-    <>
+    <div className='blog'>
       {!visible ?
         <div style={blogStyle} >
-          {blog.title} {blog.author} <button onClick={handleVisibility}>view</button>
+          {blog.title} {blog.author} <button onClick={handleVisibility} id="view">view</button>
         </div>
         :
         <Details />
       }
-    </>
+    </div>
   )
 }
 

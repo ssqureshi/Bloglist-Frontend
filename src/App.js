@@ -41,8 +41,8 @@ const Error = ({ message }) => {
   }
 
   return (
-    <div style={error}>
-      Wrong Username or Password
+    <div style={error} className="error">
+      {message}
     </div>
   )
 }
@@ -61,12 +61,22 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     return setUser(null)
   }
+  const handleLikeChange = async (id, newLike) => {
+    try {
+      await blogService.update(id, newLike)
+      const newBlogs = await blogService.getAll()
+      setBlogs(newBlogs.sort((a, b) => b.likes - a.likes))
+    }
+    catch (err) {
+      console.log(err)
+    }
+  }
   const handleNewBlog = async (newBlog) => {
     noteFormRef.current.toggleVisibility()
     try {
       const createdBlog = await blogService.create(newBlog)
 
-      setBlogs(blogs.concat(createdBlog))
+      setBlogs(await blogService.getAll())
       setSuccessMessage(`a new blog ${createdBlog.title} by ${createdBlog.author} added`)
       setTimeout(() => {
         setSuccessMessage(null)
@@ -97,7 +107,7 @@ const App = () => {
         setSuccessMessage(null)
       }, 5000)
     } catch (exception) {
-      setErrorMessage('Wrong credentials')
+      setErrorMessage('Wrong Username or Password')
 
       setTimeout(() => {
         setErrorMessage(null)
@@ -128,13 +138,13 @@ const App = () => {
           <h2>blogs</h2>
           <Notification message={successMessage} />
           <p>{user.name} logged in</p>
-          <button onClick={handleLogout}>Logout</button>
+          <button onClick={handleLogout} id="logout">Logout</button>
           <h2>create new</h2>
           <Togglable buttonLabel="new blog" ref={noteFormRef}>
             <BlogForm createBlog={handleNewBlog} />
           </Togglable>
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} setBlogs={setBlogs} blogs={blogs} user={user} />
+            <Blog key={blog.id} blog={blog} setBlogs={setBlogs} blogs={blogs} user={user} handleLikeChange={handleLikeChange} />
           )}
         </div>
       }
